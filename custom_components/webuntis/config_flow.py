@@ -330,9 +330,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         credentials["server"] = f"{parsed.scheme}://{parsed.netloc}"
 
         try:
-            socket.gethostbyname(credentials["server"])
+            # Use the hostname (without scheme/port) for DNS resolution.
+            host = parsed.hostname or parsed.netloc
+            socket.gethostbyname(host)
         except Exception as exc:
-            _LOGGER.error("Cannot resolve hostname(%s): %s", credentials["server"], exc)
+            _LOGGER.error("Cannot resolve hostname(%s): %s", host, exc)
             errors["server"] = "cannot_connect"
             return errors, None
 
